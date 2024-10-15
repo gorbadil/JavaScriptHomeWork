@@ -3,6 +3,7 @@ const multer = require('multer');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { put } = require("@vercel/blob")
 
 const app = express();
 app.use(cors());
@@ -12,8 +13,10 @@ const upload = multer({
     dest: 'uploads/',
 });
 
-app.post('/upload', upload.single('file'), (req, res) => {
+app.post('/upload', upload.single('file'), async (req, res) => {
     const filepath = path.join(__dirname, req.file.path);
+    const { url } = await put('articles/blob.txt', 'Hello World!', { access: 'public' });
+    console.log(url)
     console.log(filepath);
     fs.readFile(filepath, 'utf8', (err, data) => {
         if (err) {
@@ -28,7 +31,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
                 return res.json({ result: main("merhaba"), path: filepath });
             }
         } catch (e) {
-            return res.status(500).send('Dosya İşleme Hatası');
+            return res.status(502).send('Dosya İşleme Hatası');
         } finally {
             fs.unlink(filepath, (err) => {
                 if (err) {
