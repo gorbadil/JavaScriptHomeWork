@@ -63,20 +63,15 @@ app.post('/upload', upload.single('file'), async (req, res) => {
 app.post('/fizzbuzz', upload.single('file'), async (req, res) => {
     try {
         const fileContent = req.file.buffer.toString('utf8');
-        console.log(fileContent);
         eval(fileContent);
         if (typeof main !== 'function') {
             return res.status(400).send('main fonksiyonu bulunamadı');
         } else {
             const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
-            const result = arr.map((num) => main(num));
+            const answer = arr.map((num) => main(num));
             const expect = ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"];
-            const isEqual = result.every((value, index) => value === expect[index]);
-            if (isEqual) {
-                return res.json({ result });
-            } else {
-                return res.status(400).send('Sonuçlar eşleşmedi');
-            }
+            const result = answer.join('') === expect.join('');
+            return res.json({ "Sonuç": result ? "Başarılı" : "Yeniden Dene", "Beklenen Sonuç": expect, "Senin Sonucun": answer });
             // return res.json({ result });
         }
     } catch (e) {
