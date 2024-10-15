@@ -9,46 +9,55 @@ const app = express();
 app.use(cors());
 const port = 3000;
 
-const upload = multer({
-    dest: 'uploads/',
-});
+// const upload = multer({
+//     dest: 'uploads/',
+// });
+
+// app.post('/upload', upload.single('file'), async (req, res) => {
+//     const filepath = path.join(__dirname, req.file.path);
+//     const { url } = await put('articles/blob.txt', 'Hello World!', { access: 'public' });
+//     console.log(url)
+//     console.log(filepath);
+//     fs.readFile(filepath, 'utf8', (err, data) => {
+//         if (err) {
+//             console.error(err);
+//             return res.status(501).send('Dosya Okuma Hatası');
+//         }
+//         try {
+//             eval(data);
+//             if (typeof main !== 'function') {
+//                 return res.status(400).send('main fonksiyonu bulunamadı');
+//             } else {
+//                 return res.json({ result: main("merhaba"), path: filepath });
+//             }
+//         } catch (e) {
+//             return res.status(502).send('Dosya İşleme Hatası');
+//         } finally {
+//             fs.unlink(filepath, (err) => {
+//                 if (err) {
+//                     console.error(err);
+//                 }
+//             });
+//         }
+//     });
+// });
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 app.post('/upload', upload.single('file'), async (req, res) => {
-    const filepath = path.join(__dirname, req.file.path);
-    const { url } = await put('articles/blob.txt', 'Hello World!', { access: 'public' });
-    console.log(url)
-    console.log(filepath);
-    fs.readFile(filepath, 'utf8', (err, data) => {
-        if (err) {
-            console.error(err);
-            return res.status(501).send('Dosya Okuma Hatası');
+    try {
+        const fileContent = req.file.buffer.toString('utf8');
+        console.log(fileContent);
+        eval(fileContent);
+        if (typeof main !== 'function') {
+            return res.status(400).send('main fonksiyonu bulunamadı');
+        } else {
+            return res.json({ result: main("merhaba") });
         }
-        try {
-            eval(data);
-            if (typeof main !== 'function') {
-                return res.status(400).send('main fonksiyonu bulunamadı');
-            } else {
-                return res.json({ result: main("merhaba"), path: filepath });
-            }
-        } catch (e) {
-            return res.status(502).send('Dosya İşleme Hatası');
-        } finally {
-            fs.unlink(filepath, (err) => {
-                if (err) {
-                    console.error(err);
-                }
-            });
-        }
-    });
-});
-
-app.get(`/file/:filename`, (req, res) => {
-    const filename = req.params.filename;
-    const filepath = path.join(__dirname, 'uploads', filename);
-    return res.writeHead(200, {
-        'Content-Type': 'application/javascript',
-    }).end(fs.readFileSync(filepath
-    ));
+    } catch (e) {
+        return res.status(502).send('Dosya İşleme Hatası');
+    }
 });
 
 app.listen(port, () => {
