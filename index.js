@@ -53,7 +53,24 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         if (typeof main !== 'function') {
             return res.status(400).send('main fonksiyonu bulunamadı');
         } else {
-            return res.json({ result: main("merhaba") });
+            return res.json({ result: main() });
+        }
+    } catch (e) {
+        return res.status(502).send('Dosya İşleme Hatası');
+    }
+});
+
+app.post('/fizzbuzz', upload.single('file'), async (req, res) => {
+    try {
+        const fileContent = req.file.buffer.toString('utf8');
+        console.log(fileContent);
+        eval(fileContent);
+        if (typeof main !== 'function') {
+            return res.status(400).send('main fonksiyonu bulunamadı');
+        } else {
+            const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
+            const result = arr.map((num) => main(num));
+            return res.json({ result });
         }
     } catch (e) {
         return res.status(502).send('Dosya İşleme Hatası');
