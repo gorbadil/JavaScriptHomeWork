@@ -70,7 +70,14 @@ app.post('/fizzbuzz', upload.single('file'), async (req, res) => {
         } else {
             const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
             const result = arr.map((num) => main(num));
-            return res.json({ result });
+            const expect = ["1", "2", "Fizz", "4", "Buzz", "Fizz", "7", "8", "Fizz", "Buzz", "11", "Fizz", "13", "14", "FizzBuzz"];
+            const isEqual = result.every((value, index) => value === expect[index]);
+            if (isEqual) {
+                return res.json({ result });
+            } else {
+                return res.status(400).send('Sonuçlar eşleşmedi');
+            }
+            // return res.json({ result });
         }
     } catch (e) {
         return res.status(502).send('Dosya İşleme Hatası');
