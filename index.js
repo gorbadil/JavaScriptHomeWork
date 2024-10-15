@@ -18,7 +18,7 @@ app.post('/upload', upload.single('file'), (req, res) => {
     fs.readFile(filepath, 'utf8', (err, data) => {
         if (err) {
             console.error(err);
-            return res.status(500).send('Dosya Okuma Hatası');
+            return res.status(501).send('Dosya Okuma Hatası');
         }
         try {
             eval(data);
@@ -29,14 +29,13 @@ app.post('/upload', upload.single('file'), (req, res) => {
             }
         } catch (e) {
             return res.status(500).send('Dosya İşleme Hatası');
+        } finally {
+            fs.unlink(filepath, (err) => {
+                if (err) {
+                    console.error(err);
+                }
+            });
         }
-        // finally {
-        //     fs.unlink(filepath, (err) => {
-        //         if (err) {
-        //             console.error(err);
-        //         }
-        //     });
-        // }
     });
 });
 
